@@ -1,0 +1,21 @@
+# Virtual environment
+.venv/
+
+# Python-generated files
+__pycache__/
+*.pyc
+
+# Jupyter-generated files
+.ipynb_checkpoints/
+
+# macOS-generated files
+.DS_Store
+
+# Private environment settings
+.env
+
+# Generated data and trained models
+data/raw/*.csv
+data/processed/*
+!data/processed/.gitkeep
+models/*.joblib
