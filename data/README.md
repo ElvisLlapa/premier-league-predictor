@@ -17,21 +17,54 @@ Column definitions and source acknowledgements are available in the
 - 2024/25
 - 2025/26
 
-Each completed Premier League season contains 380 matches. The six seasons
-produce 2,280 raw match records in total.
+Each completed season contains 380 matches. The six seasons contain 2,280
+matches in total.
 
 ## Raw files
 
 Files under `data/raw/` are preserved in their original downloaded form.
 
-They should not be manually edited. Cleaning, standardization, feature
-creation, and combination will produce separate files under
-`data/processed/`.
+They must not be manually edited. Cleaning, standardization, feature creation,
+and combination produce separate files under `data/processed/`.
 
-The raw CSV files are not committed to Git. They can be recreated using the
-project downloader.
+The raw CSV files are not committed to Git because the source does not provide
+a clear redistribution license. They can be recreated with:
 
-## Primary columns
+```bash
+python -m src.data_loader
+```
+
+## Processed dataset
+
+Phase 3 creates:
+
+```text
+data/processed/premier_league_matches.csv
+```
+
+The processed dataset contains:
+
+- Six seasons
+- 380 matches per season
+- 2,280 matches in total
+- 21 columns
+- Standardized column names
+- Dates formatted as `YYYY-MM-DD`
+- Standardized team names
+- No missing values
+- No duplicate rows
+- Result labels verified against final scores
+- Matches sorted chronologically
+
+Create or replace the processed dataset with:
+
+```bash
+python -m src.data_cleaner
+```
+
+The cleaning program reads the raw CSV files but never changes them.
+
+## Primary raw columns
 
 - `Date`: match date
 - `HomeTeam`: home club
@@ -72,7 +105,7 @@ Historical performance candidates:
 - `HR` and `AR`
 
 Half-time results, referee information, and bookmaker odds are excluded from
-the Version 1 model inputs.
+Version 1 model inputs.
 
 ## Leakage policy
 
@@ -84,19 +117,25 @@ full-time result of the match being predicted cannot be model inputs.
 
 ## Reproducibility
 
-Run the downloader from the project root:
+Download the raw data:
 
 ```bash
 python -m src.data_loader
 ```
 
-Inspect the downloaded files:
+Inspect the raw data:
 
 ```bash
 python notebooks/inspect_data.py
 ```
 
-Validate the datasets:
+Create the processed dataset:
+
+```bash
+python -m src.data_cleaner
+```
+
+Run the tests:
 
 ```bash
 python -m pytest -v
