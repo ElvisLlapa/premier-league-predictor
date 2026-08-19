@@ -30,17 +30,13 @@ and combination produce separate files under `data/processed/`.
 The raw CSV files are not committed to Git because the source does not provide
 a clear redistribution license. They can be recreated with:
 
-```bash
-python -m src.data_loader
-```
+    python -m src.data_loader
 
 ## Processed dataset
 
 Phase 3 creates:
 
-```text
-data/processed/premier_league_matches.csv
-```
+    data/processed/premier_league_matches.csv
 
 The processed dataset contains:
 
@@ -58,11 +54,42 @@ The processed dataset contains:
 
 Create or replace the processed dataset with:
 
-```bash
-python -m src.data_cleaner
-```
+    python -m src.data_cleaner
 
 The cleaning program reads the raw CSV files but never changes them.
+
+## Feature dataset
+
+Phase 4 creates:
+
+    data/processed/premier_league_features.csv
+
+The feature dataset contains:
+
+- 2,280 match rows
+- 48 columns
+- Previous-five-match points, wins, draws, and losses
+- Previous-five-match goals and goal difference
+- Separate home and away form
+- Season points before each match
+- Matches played before each match
+- Days since each team's previous match
+- Home and away historical features on the same row
+
+Create or replace the feature dataset with:
+
+    python -m src.feature_engineer
+
+All rolling and cumulative features are shifted so that the current match is
+excluded. Form values are set to zero when no earlier matches are available.
+Rest days are missing for a team's first appearance because no earlier match
+date exists.
+
+The `home_goals`, `away_goals`, and `result` columns are prediction targets
+and must not be used as model inputs.
+
+Like the cleaned dataset, the generated feature CSV is not committed to Git.
+It can be recreated from the processed match dataset.
 
 ## Primary raw columns
 
@@ -119,24 +146,20 @@ full-time result of the match being predicted cannot be model inputs.
 
 Download the raw data:
 
-```bash
-python -m src.data_loader
-```
+    python -m src.data_loader
 
 Inspect the raw data:
 
-```bash
-python notebooks/inspect_data.py
-```
+    python notebooks/inspect_data.py
 
 Create the processed dataset:
 
-```bash
-python -m src.data_cleaner
-```
+    python -m src.data_cleaner
+
+Create the feature dataset:
+
+    python -m src.feature_engineer
 
 Run the tests:
 
-```bash
-python -m pytest -v
-```
+    python -m pytest -v

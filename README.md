@@ -18,7 +18,7 @@ table.
 - Phase 1: Project setup — complete
 - Phase 2: Data download and inspection — complete
 - Phase 3: Data cleaning and combination — complete
-- Phase 4: Feature engineering — next
+- Phase 4: Leakage-safe feature engineering — complete
 
 ## Dataset
 
@@ -80,6 +80,32 @@ The program:
 - Adds season identifiers
 - Combines matches chronologically
 - Saves 2,280 matches to `data/processed/premier_league_matches.csv`
+
+## Create the feature dataset
+
+Run the feature-engineering program from the project root:
+
+```bash
+python -m src.feature_engineer
+```
+
+The program:
+
+- Converts every match into home-team and away-team records
+- Calculates team results, points, and goal difference
+- Shifts match information to exclude the current match
+- Calculates form from the previous five matches
+- Calculates separate home and away form
+- Calculates season points before each match
+- Calculates days since each team's previous match
+- Merges the home and away features onto one match row
+- Saves 2,280 matches to `data/processed/premier_league_features.csv`
+
+The feature dataset contains 48 columns. Historical features use only matches
+played before the match represented by the current row.
+
+The `home_goals`, `away_goals`, and `result` columns are prediction targets.
+They must not be included as model input features.
 
 ## Testing and code quality
 
