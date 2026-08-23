@@ -21,6 +21,7 @@ table.
 - Phase 4: Leakage-safe feature engineering — complete
 - Phase 5: Chronological Elo ratings — complete
 - Phase 6: First Random Forest model — complete
+- Phase 7: Time-based validation and evaluation — complete
 
 ## Dataset
 
@@ -176,6 +177,66 @@ The Joblib bundle contains the trained production model, fitted median
 imputer, 43 feature names, class labels, holdout metrics, training seasons,
 and prediction-season metadata. Generated model and data files are ignored
 by Git.
+
+## Evaluate the model over time
+
+Run the time-based evaluation program from the project root:
+
+```bash
+python -m src.evaluate
+```
+
+The evaluation uses three expanding-window chronological folds:
+
+| Fold | Training seasons | Unseen test season |
+| ---: | --- | --- |
+| 1 | 2020/21 through 2022/23 | 2023/24 |
+| 2 | 2020/21 through 2023/24 | 2024/25 |
+| 3 | 2020/21 through 2024/25 | 2025/26 |
+
+A completely new median imputer, most-common-result baseline, and Random
+Forest are fitted inside every fold. No model or preprocessing information
+from a later season is reused in an earlier fold.
+
+Average results across the three unseen seasons:
+
+- Baseline accuracy: 43.2%
+- Random Forest accuracy: 52.5%
+- Improvement over baseline: 9.3 percentage points
+- Multiclass log loss: 0.996
+- Home-win F1 score: 0.639
+- Draw F1 score: 0.014
+- Away-win F1 score: 0.536
+
+The Random Forest beat the baseline in all three folds. Home wins were the
+strongest result class, while draw detection was the largest weakness. Only
+2 of 279 draws were predicted correctly across the three test seasons.
+
+The evaluation also calculates:
+
+- Precision, recall, and F1 score for home wins, draws, and away wins
+- Confusion matrices for every test season
+- One-vs-rest probability calibration
+- Brier scores for all three result classes
+- Feature importance across all validation folds
+
+Elo difference, Elo expected scores, and team Elo ratings were the most
+important model inputs across the three folds.
+
+The complete evaluation report is available at
+[`reports/phase_7/evaluation_report.md`](reports/phase_7/evaluation_report.md).
+
+Saved Phase 7 artifacts include:
+
+- Seven CSV evaluation tables in `reports/phase_7/tables/`
+- Accuracy comparison chart
+- Three-fold confusion-matrix chart
+- Probability-calibration chart
+- Feature-importance chart
+
+The Phase 7 evaluation models are separate from the final production model.
+The production model remains trained on all six completed seasons for
+predicting 2026/27.
 
 ## Testing and code quality
 
