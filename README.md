@@ -1,6 +1,6 @@
 # Premier League Predictor
 
-A portfolio project that will use historical Premier League match data and
+A portfolio project that uses historical Premier League match data and
 machine learning to predict match outcomes and simulate the final league
 table.
 
@@ -19,6 +19,7 @@ table.
 - Phase 2: Data download and inspection — complete
 - Phase 3: Data cleaning and combination — complete
 - Phase 4: Leakage-safe feature engineering — complete
+- Phase 5: Chronological Elo ratings — complete
 
 ## Dataset
 
@@ -106,6 +107,31 @@ played before the match represented by the current row.
 
 The `home_goals`, `away_goals`, and `result` columns are prediction targets.
 They must not be included as model input features.
+
+## Create the Elo datasets
+
+Run the Elo program from the project root:
+
+```bash
+python -m src.elo
+```
+
+The program:
+
+- Gives every new team an initial Elo rating of 1500
+- Uses a K-factor of 20 to update ratings
+- Adds a 100-point home advantage to expected-score calculations
+- Processes all matches chronologically
+- Stores each team's rating before the current match
+- Makes surprising results cause larger rating changes
+- Adds home Elo, away Elo, Elo difference, and expected-score features
+- Saves 2,280 matches to
+  `data/processed/premier_league_features_with_elo.csv`
+- Saves 4,560 team records to
+  `data/processed/premier_league_elo_history.csv`
+
+The current match result updates team ratings only for future matches. This
+prevents match-result leakage into the Elo features.
 
 ## Testing and code quality
 
