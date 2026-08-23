@@ -20,6 +20,7 @@ table.
 - Phase 3: Data cleaning and combination — complete
 - Phase 4: Leakage-safe feature engineering — complete
 - Phase 5: Chronological Elo ratings — complete
+- Phase 6: First Random Forest model — complete
 
 ## Dataset
 
@@ -132,6 +133,49 @@ The program:
 
 The current match result updates team ratings only for future matches. This
 prevents match-result leakage into the Elo features.
+
+## Train the Random Forest model
+
+Run the training program from the project root:
+
+```bash
+python -m src.train
+```
+
+The training program:
+
+- Selects 43 leakage-safe pre-match features
+- Excludes final goals, match results, dates, and team names
+- Trains on the 2020/21 through 2024/25 seasons
+- Reserves the complete 2025/26 season as unseen test data
+- Builds a most-common-result baseline
+- Learns missing-value medians from training data only
+- Trains a three-class Random Forest classifier
+- Produces home-win, draw, and away-win probabilities
+- Maps probabilities using the model's actual class order
+- Retrains the production model on all six completed seasons
+- Saves the production model for 2026/27 predictions
+
+The chronological holdout results are:
+
+- Baseline accuracy: 42.6%
+- Random Forest accuracy: 47.4%
+- Improvement over baseline: 4.7 percentage points
+- Training matches: 1,900
+- Unseen test matches: 380
+
+After evaluation, the production model is retrained on all 2,280 matches
+through May 24, 2026. It is intended for predicting the 2026/27 season.
+
+Generated artifacts:
+
+- `models/random_forest_model.joblib`
+- `data/processed/random_forest_test_predictions.csv`
+
+The Joblib bundle contains the trained production model, fitted median
+imputer, 43 feature names, class labels, holdout metrics, training seasons,
+and prediction-season metadata. Generated model and data files are ignored
+by Git.
 
 ## Testing and code quality
 
